@@ -53,10 +53,6 @@ jobs:
           rm -rf /host/opt/ghc || true
           rm -rf /host/usr/local/.ghcup || true
           
-          # Remove CodeQL
-          echo "Removing CodeQL..."
-          rm -rf /host/opt/hostedtoolcache/CodeQL || true
-          
           # Remove Boost
           echo "Removing Boost..."
           rm -rf /host/usr/local/share/boost || true
@@ -81,8 +77,8 @@ jobs:
           echo "Removing Chromium..."
           rm -rf /host/usr/local/share/chromium || true
           
-          # Remove Firefox
-          echo "Removing Firefox..."
+          # Remove Firefox and Google Chrome
+          echo "Removing browsers (Firefox, Chrome)..."
           rm -rf /host/opt/firefox || true
           rm -rf /host/opt/google || true
           
@@ -116,5 +112,5 @@ jobs:
           echo "Final disk space check:"
           df -h
           echo ""
-          echo "Available space on root:"
-          df -h / | tail -1 | awk '{print $4 " available"}'
+          echo "Available space on root filesystem:"
+          df -h / | tail -1 | awk '{print "Available: " $4}'
