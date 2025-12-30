@@ -1,28 +1,123 @@
-# This is a basic workflow to help you get started with Actions
+# Workflow to analyze ubuntu-latest runner and optimize disk space
 
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  analyze-disk-space:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
       
-      - run: df -h
-      - run: du --max-depth=2 -h /
+      - name: Show initial disk space
+        run: |
+          echo "=== Initial Disk Space ==="
+          df -h
+          echo ""
+          echo "=== Disk usage by partition ==="
+          df -h /
+      
+      - name: Analyze large directories in common locations
+        run: |
+          echo "=== Analyzing disk usage in key directories ==="
+          echo ""
+          echo "--- /usr directory (system binaries and libraries) ---"
+          sudo du -sh /usr/* 2>/dev/null | sort -hr | head -20
+          echo ""
+          echo "--- /opt directory (optional software packages) ---"
+          sudo du -sh /opt/* 2>/dev/null | sort -hr | head -20
+          echo ""
+          echo "--- /var directory (variable data, logs, cache) ---"
+          sudo du -sh /var/* 2>/dev/null | sort -hr | head -20
+          echo ""
+          echo "--- Home directory ---"
+          du -sh ~/* 2>/dev/null | sort -hr | head -20 || echo "No files in home directory"
+      
+      - name: List installed packages and their sizes
+        run: |
+          echo "=== Large installed packages (top 30) ==="
+          dpkg-query -W -f='${Installed-Size}\t${Package}\n' | sort -nr | head -30 | awk '{printf "%.2f MB\t%s\n", $1/1024, $2}'
+      
+      - name: Show Docker images and their sizes
+        run: |
+          echo "=== Docker images ==="
+          docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" || echo "No docker images or docker not available"
+      
+      - name: Identify removable content for space optimization
+        run: |
+          echo "=== Analysis of removable content ==="
+          echo ""
+          echo "--- Android SDK (if present) ---"
+          du -sh /usr/local/lib/android 2>/dev/null || echo "Android SDK not found"
+          echo ""
+          echo "--- .NET SDKs ---"
+          du -sh /usr/share/dotnet 2>/dev/null || echo ".NET not found"
+          echo ""
+          echo "--- Swift ---"
+          du -sh /usr/share/swift 2>/dev/null || echo "Swift not found"
+          echo ""
+          echo "--- Large tool caches ---"
+          du -sh /opt/hostedtoolcache 2>/dev/null || echo "Tool cache not found"
+          echo ""
+          echo "--- APT cache ---"
+          du -sh /var/cache/apt 2>/dev/null || echo "APT cache not found"
+      
+      - name: Demonstrate space-saving techniques
+        run: |
+          echo "=== Demonstrating space-saving techniques ==="
+          echo ""
+          echo "Before cleanup:"
+          df -h / | grep -v Filesystem
+          
+          # Remove Android SDK (usually ~10GB)
+          echo ""
+          echo "--- Removing Android SDK ---"
+          sudo rm -rf /usr/local/lib/android || echo "Android SDK already removed"
+          
+          # Remove .NET (usually ~2-3GB)
+          echo ""
+          echo "--- Removing .NET SDKs ---"
+          sudo rm -rf /usr/share/dotnet || echo ".NET already removed"
+          
+          # Remove Swift (usually ~1-2GB)
+          echo ""
+          echo "--- Removing Swift ---"
+          sudo rm -rf /usr/share/swift || echo "Swift already removed"
+          
+          # Clean apt cache
+          echo ""
+          echo "--- Cleaning APT cache ---"
+          sudo apt-get clean
+          
+          # Remove unnecessary packages
+          echo ""
+          echo "--- Removing unnecessary packages ---"
+          sudo apt-get autoremove -y
+          
+          echo ""
+          echo "After cleanup:"
+          df -h / | grep -v Filesystem
+      
+      - name: Calculate space saved
+        run: |
+          echo "=== Summary ==="
+          echo "Check the 'Before cleanup' and 'After cleanup' outputs above to see space gained."
+          echo ""
+          echo "Common removable items on ubuntu-latest:"
+          echo "  - Android SDK: ~10-12 GB"
+          echo "  - .NET SDKs: ~2-3 GB"
+          echo "  - Swift: ~1-2 GB"
+          echo "  - Docker images: varies"
+          echo "  - APT cache: ~100-500 MB"
+          echo "  - Hostedtoolcache: varies by cached tools"
+          echo ""
+          echo "=== Final disk space ==="
+          df -h
