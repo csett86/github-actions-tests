@@ -25,4 +25,4 @@ jobs:
       - uses: actions/checkout@v4
       
       - run: df -h
-      - run: du --max-depth=2 -h /
+      - run: du --max-depth=1 -h / 2>/dev/null
