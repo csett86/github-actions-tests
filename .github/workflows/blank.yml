@@ -43,61 +43,75 @@ jobs:
           # Remove .NET SDK and runtime
           echo "Removing .NET..."
           rm -rf /host/usr/share/dotnet || true
+          df -h /
           
           # Remove Android SDK
           echo "Removing Android SDK..."
           rm -rf /host/usr/local/lib/android || true
+          df -h /
           
           # Remove Haskell
           echo "Removing Haskell..."
           rm -rf /host/opt/ghc || true
           rm -rf /host/usr/local/.ghcup || true
+          df -h /
           
           # Remove Boost
           echo "Removing Boost..."
           rm -rf /host/usr/local/share/boost || true
+          df -h /
           
           # Remove Swift
           echo "Removing Swift..."
           rm -rf /host/usr/share/swift || true
+          df -h /
           
           # Remove Azure CLI
           echo "Removing Azure CLI..."
           rm -rf /host/opt/az || true
+          df -h /
           
           # Remove Microsoft tools
           echo "Removing Microsoft tools..."
           rm -rf /host/opt/microsoft || true
+          df -h /
           
           # Remove PowerShell
           echo "Removing PowerShell..."
           rm -rf /host/usr/local/share/powershell || true
+          df -h /
           
           # Remove Chromium
           echo "Removing Chromium..."
           rm -rf /host/usr/local/share/chromium || true
+          df -h /
           
           # Remove Firefox and Google Chrome
           echo "Removing browsers (Firefox, Chrome)..."
           rm -rf /host/opt/firefox || true
           rm -rf /host/opt/google || true
+          df -h /
           
           # Remove hostedtoolcache (Python, Ruby, Node versions, etc.)
           echo "Removing hostedtoolcache..."
           rm -rf /host/opt/hostedtoolcache || true
+          df -h /
           
           # Remove Java versions
           echo "Removing Java installations..."
           rm -rf /host/usr/lib/jvm || true
+          df -h /
           
           # Remove Mono
           echo "Removing Mono..."
           rm -rf /host/usr/lib/mono || true
+          df -h /
           
           # Remove large cached packages
           echo "Removing cached packages..."
           rm -rf /host/var/cache/apt/archives || true
           rm -rf /host/var/lib/apt/lists || true
+          df -h /
           
           echo ""
           echo "============================================================"
