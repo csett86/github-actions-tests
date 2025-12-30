@@ -24,12 +24,64 @@ jobs:
       image: reactnativecommunity/react-native-android:v15.0
       volumes:
         - /usr/local:/host/usr/local
+        - /usr/share:/host/usr/share
+        - /opt:/host/opt
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Free Disk Space on Host
+        run: |
+          echo "============================================================"
+          echo "Freeing up disk space on host from container..."
+          echo "============================================================"
+          echo "Disk usage before cleanup:"
+          df -h
+          echo ""
+          
+          # Remove .NET SDK and runtime
+          echo "Removing .NET..."
+          rm -rf /host/usr/share/dotnet || true
+          
+          # Remove Android SDK
+          echo "Removing Android SDK..."
+          rm -rf /host/usr/local/lib/android || true
+          
+          # Remove Haskell
+          echo "Removing Haskell..."
+          rm -rf /host/opt/ghc || true
+          rm -rf /host/usr/local/.ghcup || true
+          
+          # Remove CodeQL
+          echo "Removing CodeQL..."
+          rm -rf /host/opt/hostedtoolcache/CodeQL || true
+          
+          # Remove Boost
+          echo "Removing Boost..."
+          rm -rf /host/usr/local/share/boost || true
+          
+          # Remove Swift
+          echo "Removing Swift..."
+          rm -rf /host/usr/share/swift || true
+          
+          # Remove other large packages
+          echo "Removing other large directories..."
+          rm -rf /host/usr/local/share/chromium || true
+          rm -rf /host/usr/local/share/powershell || true
+          rm -rf /host/opt/az || true
+          rm -rf /host/opt/microsoft || true
+          
+          echo ""
+          echo "============================================================"
+          echo "Disk usage after cleanup:"
+          df -h
+          echo "============================================================"
+      
       - uses: actions/checkout@v4
       
-      - run: df -h
-      - run: rm -rf /host/usr/local/lib/android
-      - run: rm -rf /host/usr/local/.ghcup
-      - run: df -h
+      - name: Verify available space
+        run: |
+          echo "Final disk space check:"
+          df -h
+          echo ""
+          echo "Available space on root:"
+          df -h / | tail -1 | awk '{print $4 " available"}'
