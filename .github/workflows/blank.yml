@@ -23,13 +23,25 @@ jobs:
     container:
       image: reactnativecommunity/react-native-android:v15.0
       volumes:
-        - /usr/local:/host/usr/local
+        - /usr:/host/usr
+        - /opt:/host/opt
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v4
       
-      - run: df -h
+      - run: df -h /
       - run: rm -rf /host/usr/local/lib/android
+      - run: df -h /
       - run: rm -rf /host/usr/local/.ghcup
-      - run: df -h
+      - run: df -h /
+      - run: rm -rf /host/usr/share/dotnet
+      - run: df -h /
+      - run: rm -rf /host/opt/ghc
+      - run: df -h /
+      - run: rm -rf /usr/local/share/boost
+      - run: df -h /
+      - run: rm -rf /host/usr/share/swift
+      - run: df -h /
+      - run: rm -rf /opt/az
+      - run: df -h /
