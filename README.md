@@ -79,7 +79,7 @@ For convenience, you can use community actions like `jlumbroso/free-disk-space`:
 
 ```yaml
 - name: Free Disk Space
-  uses: jlumbroso/free-disk-space@main
+  uses: jlumbroso/free-disk-space@v1.3.1
   with:
     android: true
     dotnet: true
@@ -88,6 +88,8 @@ For convenience, you can use community actions like `jlumbroso/free-disk-space`:
     docker-images: true
     swap-storage: true
 ```
+
+Note: Always use a specific version tag instead of `@main` for production workflows to ensure stability.
 
 ## Typical Space Gains
 
